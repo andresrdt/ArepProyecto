@@ -95,7 +95,11 @@ public class AppServer {
                 String line;
                 while ((line = in.readLine()) != null) {
                     if (line.toLowerCase().contains("GET".toLowerCase())) {
-                        if (line.toLowerCase().contains("/resources/".toLowerCase())) {
+                        if(line.toLowerCase().contains("/-".toLowerCase())){
+                            String recurso="/resources/index.html";
+                            enMemoria(recurso, cliente);
+                        }
+                        else if (line.toLowerCase().contains("/resources/".toLowerCase())) {
                             String recurso = line.split(" ")[1];
                             if (!recurso.toLowerCase().contains("?")) {
                                 if (lista.containsKey(recurso)) {
@@ -114,12 +118,11 @@ public class AppServer {
                                     out.println("\r\n");
                                     out.println(lista.get(recursoLocacion).inicio(new Object[]{recurso.substring(recurso.indexOf("?") + 1)}));
                                 } else {
-
+                                    System.out.println("aquiASDA");
                                     enMemoria(recurso, cliente);
                                 }
                             }
                         } else {
-                            System.out.println("aqui");
                             String recurso = line.split(" ")[1];
                             enMemoria(recurso, cliente);
                         }
@@ -128,7 +131,7 @@ public class AppServer {
                         break;
                     }
                 }
-
+                in.close();
             }
             cliente.close();
             serverSocket.close();
