@@ -62,7 +62,7 @@ public class AppServer {
         } catch (Exception ex) {
             Logger.getLogger(AppServer.class.getName()).log(Level.SEVERE, null, ex);
         }*/
-        Reflections reflections = new Reflections("edu.eci.arep.apps", new SubTypesScanner(false));
+         Reflections reflections = new Reflections("edu.escuelaing.Apps", new SubTypesScanner(false));
         Set<Class<? extends Object>> allClasses = reflections.getSubTypesOf(Object.class);
 
         for (Class clase : allClasses) {
@@ -83,6 +83,7 @@ public class AppServer {
     public void escuchar() throws Exception {
         while (true) {
             ServerSocket serverSocket = new ServerSocket(AppServer.getPort());
+            System.out.println("Listo para recibir ...");
             Socket cliente = serverSocket.accept();
             while (!cliente.isClosed()) {
                 PrintWriter out = new PrintWriter(
@@ -224,6 +225,7 @@ public class AppServer {
         } catch (Exception e) {
             System.out.println("recurso no existe");
         }
+        
 
     }
 }
