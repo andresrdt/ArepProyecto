@@ -103,20 +103,22 @@ public class AppServer {
                             String recurso = line.split(" ")[1];
                             if (!recurso.toLowerCase().contains("?")) {
                                 if (lista.containsKey(recurso)) {
-                                    out.println("HTTP/1.1 200 OK \r");
-                                    out.println("Content-Type: text/html \r\n");
+                                    out.print("HTTP/1.1 200 OK \r");
+                                    out.print("Content-Type: text/html \r\n");
                                     out.print("\r\n");
-                                    out.println(lista.get(recurso).iniciar());
+                                    out.print(lista.get(recurso).iniciar());
+                                    out.flush();
                                 } else {
                                     enMemoria(recurso, cliente);
                                 }
                             } else {
                                 String recursoLocacion = recurso.substring(recurso.indexOf("/resources/"), recurso.indexOf("?"));
                                 if (lista.containsKey(recursoLocacion)) {
-                                    out.println("HTTP/1.1 200 OK");
-                                    out.println("Content-Type: text/html");
+                                    out.print("HTTP/1.1 200 OK \r");
+                                    out.print("Content-Type: text/html \r\n");
                                     out.print("\r\n");
-                                    out.println(lista.get(recursoLocacion).inicio(new Object[]{recurso.substring(recurso.indexOf("?") + 1)}));
+                                    out.print(lista.get(recursoLocacion).inicio(new Object[]{recurso.substring(recurso.indexOf("?") + 1)}));
+                                    out.flush(); 
                                 } else {
                                     enMemoria(recurso, cliente);
                                 }
