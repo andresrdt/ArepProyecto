@@ -96,10 +96,10 @@ public class AppServer {
                             String recurso = line.split(" ")[1];
                             if (!recurso.toLowerCase().contains("?")) {
                                 if (lista.containsKey(recurso)) {
-                                    System.out.println("HTTP/1.1 200 OK");
-                                    System.out.println("Content-Type: text/html");
-                                    System.out.println("\r\n");
-                                    System.out.println(lista.get(recurso).iniciar());
+                                    out.println("HTTP/1.1 200 OK \n");
+                                    out.println("Content-Type: text/html \n\r");
+                                    out.println("\r\n");
+                                    out.println(lista.get(recurso).iniciar());
                                 } else {
                                     enMemoria( recurso, cliente);
                                 }
