@@ -44,6 +44,7 @@ import org.reflections.scanners.SubTypesScanner;
  */
 public class AppServer {
 
+    public DataOutputStream binaryOut;
     private Map<String, hand> lista;
 
     public AppServer() {
@@ -62,7 +63,7 @@ public class AppServer {
         } catch (Exception ex) {
             Logger.getLogger(AppServer.class.getName()).log(Level.SEVERE, null, ex);
         }*/
-         Reflections reflections = new Reflections("edu.escuelaing.Apps", new SubTypesScanner(false));
+        Reflections reflections = new Reflections("edu.escuelaing.Apps", new SubTypesScanner(false));
         Set<Class<? extends Object>> allClasses = reflections.getSubTypesOf(Object.class);
 
         for (Class clase : allClasses) {
@@ -83,12 +84,14 @@ public class AppServer {
     public void escuchar() throws Exception {
         while (true) {
             ServerSocket serverSocket = new ServerSocket(AppServer.getPort());
+
             System.out.println("Listo para recibir ...");
             Socket cliente = serverSocket.accept();
             while (!cliente.isClosed()) {
                 PrintWriter out = new PrintWriter(
                         new OutputStreamWriter(cliente.getOutputStream(), StandardCharsets.UTF_8), true);
                 BufferedReader in = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
+                binaryOut = new DataOutputStream(cliente.getOutputStream());
                 String line;
                 while ((line = in.readLine()) != null) {
                     if (line.toLowerCase().contains("GET".toLowerCase())) {
@@ -96,48 +99,49 @@ public class AppServer {
                             String recurso = line.split(" ")[1];
                             if (!recurso.toLowerCase().contains("?")) {
                                 if (lista.containsKey(recurso)) {
-                                    out.println("HTTP/1.1 200 OK \n");
-                                    out.println("Content-Type: text/html \n\r");
+                                    out.println("HTTP/1.1 200 OK \r");
+                                    out.println("Content-Type: text/html \r\n");
                                     out.println("\r\n");
                                     out.println(lista.get(recurso).iniciar());
                                 } else {
-                                    enMemoria( recurso, cliente);
+                                    enMemoria(recurso, cliente);
                                 }
                             } else {
                                 String recursoLocacion = recurso.substring(recurso.indexOf("/resources/"), recurso.indexOf("?"));
                                 if (lista.containsKey(recursoLocacion)) {
-                                    System.out.println("HTTP/1.1 200 OK");
-                                    System.out.println("Content-Type: text/html");
-                                    System.out.println("\r\n");
-                                    System.out.println(lista.get(recursoLocacion).inicio(new Object[]{recurso.substring(recurso.indexOf("?") + 1)}));
+                                    out.println("HTTP/1.1 200 OK");
+                                    out.println("Content-Type: text/html");
+                                    out.println("\r\n");
+                                    out.println(lista.get(recursoLocacion).inicio(new Object[]{recurso.substring(recurso.indexOf("?") + 1)}));
                                 } else {
-                                    enMemoria( recurso, cliente);
+
+                                    enMemoria(recurso, cliente);
                                 }
                             }
                         } else {
+                            System.out.println("aqui");
                             String recurso = line.split(" ")[1];
-                            enMemoria( recurso, cliente);
+                            enMemoria(recurso, cliente);
                         }
-                        out.close();
                     }
                     if (!in.ready()) {
                         break;
                     }
                 }
-                in.close();
+
             }
             cliente.close();
             serverSocket.close();
         }
     }
-    public String readResource(String direction){
-        
+
+    public String readResource(String direction) {
         String file, contentType = "";
-        String resource="";
-       
+        String resource = "";
+
         contentType = "text/html";
         try {
-            BufferedReader bf = new BufferedReader(new FileReader("resources/" + direction));
+            BufferedReader bf = new BufferedReader(new FileReader(direction));
             String temp = "";
             String bfRead = "";
             while ((bfRead = bf.readLine()) != null) {
@@ -150,17 +154,16 @@ public class AppServer {
             System.err.println("No se ha encontrado el archivo");
 
         }
-        
+
         file = "HTTP/1.1 200 OK\r\n"
-             + "Content-Type: "+ contentType+"\r\n"
-             + "\r\n"
-             +resource;
-        
+                + "Content-Type: " + contentType + "\r\n"
+                + "\r\n"
+                + resource;
+
         return file;
-        
-        
+
     }
-    
+
     private void getHtml(String direction, Socket client) throws Exception {
         String serverAns = readResource(direction);
         PrintWriter out;
@@ -178,8 +181,6 @@ public class AppServer {
 
         try {
             File graphicResource = new File(direction);
-            
-            System.out.println(graphicResource.getPath());
             FileInputStream inputImage = new FileInputStream((graphicResource.getPath()));
             finalData = new byte[(int) graphicResource.length()];
             inputImage.read(finalData);
@@ -201,31 +202,30 @@ public class AppServer {
         return 4567; // returns default port if heroku-port isn't set (i.e. on localhost)
     }
 
-    private void enMemoria( String camino, Socket cliente) throws Exception {
+    private void enMemoria(String camino, Socket cliente) throws Exception {
         String path = System.getProperty("user.dir") + camino;
         try {
             if (path.toLowerCase().contains(".html".toLowerCase())) {
-                getHtml(path,cliente);
+
+                getHtml(path, cliente);
             } else if (path.toLowerCase().contains(".png".toLowerCase())) {
-                System.out.println(path);
-                byte[] serverAns=leerIma(path);
-                DataOutputStream binaryOut;
-            try {
-                binaryOut = new DataOutputStream(cliente.getOutputStream());
-                binaryOut.writeBytes("HTTP/1.1 200 OK \r\n");
-                binaryOut.writeBytes("Content-Type: image/png\r\n");
-                binaryOut.writeBytes("Content-Length: " + serverAns.length);
-                binaryOut.writeBytes("\r\n\r\n");
-                binaryOut.write(serverAns);
-                binaryOut.close();
-            } catch (IOException ex) {
-                Logger.getLogger(AppServer.class.getName()).log(Level.SEVERE, null, ex);
-            }   
+
+                byte[] serverAns = leerIma(path);
+                try {
+                    binaryOut = new DataOutputStream(cliente.getOutputStream());
+                    binaryOut.writeBytes("HTTP/1.1 200 OK \r\n");
+                    binaryOut.writeBytes("Content-Type: image/png\r\n");
+                    binaryOut.writeBytes("Content-Length: " + serverAns.length);
+                    binaryOut.writeBytes("\r\n\r\n");
+                    binaryOut.write(serverAns);
+                    binaryOut.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(AppServer.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         } catch (Exception e) {
             System.out.println("recurso no existe");
         }
-        
 
     }
 }

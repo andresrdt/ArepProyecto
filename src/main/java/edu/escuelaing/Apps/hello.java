@@ -12,7 +12,7 @@ import edu.escuelaing.anotaciones.webs;
  * @author Andres
  */
 public class hello {
-    @webs(value="hello")
+    @webs(value="hello.html")
    public static String pagina()
     {
         return "<!DOCTYPE html> <html> <head> <title> WEB </title>  </head> <body> <h1>hello world </h1> </body> </html>";

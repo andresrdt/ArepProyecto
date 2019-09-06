@@ -15,7 +15,7 @@ import edu.escuelaing.anotaciones.webs;
  */
 
 public class media {
-   @webs(value="prueba")
+   @webs(value="prueba.html")
    public static String pagina()
     {
         return "<!DOCTYPE html> <html> <head> <title> WEB </title>  </head> <body> <h1>Prueba </h1> </body> </html>";
