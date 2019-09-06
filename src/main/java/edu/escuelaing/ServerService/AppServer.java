@@ -105,7 +105,7 @@ public class AppServer {
                                 if (lista.containsKey(recurso)) {
                                     out.println("HTTP/1.1 200 OK \r");
                                     out.println("Content-Type: text/html \r\n");
-                                    out.println("\r\n");
+                                    out.print("\r\n");
                                     out.println(lista.get(recurso).iniciar());
                                 } else {
                                     enMemoria(recurso, cliente);
@@ -115,7 +115,7 @@ public class AppServer {
                                 if (lista.containsKey(recursoLocacion)) {
                                     out.println("HTTP/1.1 200 OK");
                                     out.println("Content-Type: text/html");
-                                    out.println("\r\n");
+                                    out.print("\r\n");
                                     out.println(lista.get(recursoLocacion).inicio(new Object[]{recurso.substring(recurso.indexOf("?") + 1)}));
                                 } else {
                                     enMemoria(recurso, cliente);
@@ -171,7 +171,7 @@ public class AppServer {
         PrintWriter out;
         try {
             out = new PrintWriter(client.getOutputStream(), true);
-            out.print(serverAns);
+            out.println(serverAns);
 
         } catch (IOException ex) {
             Logger.getLogger(AppServer.class.getName()).log(Level.SEVERE, null, ex);
