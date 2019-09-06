@@ -15,13 +15,10 @@ import edu.escuelaing.anotaciones.webs;
  */
 
 public class media {
-   @webs(media="value")
+   @webs(value="prueba")
    public static String pagina()
     {
-        return "prueba";
+        return "<!DOCTYPE html> <html> <head> <title> WEB </title>  </head> <body> <h1>Prueba </h1> </body> </html>";
     }
-   public static int prubeba(){
-       return 1;
-   }
    
 }

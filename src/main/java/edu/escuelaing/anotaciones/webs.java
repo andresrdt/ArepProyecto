@@ -5,11 +5,21 @@
  */
 package edu.escuelaing.anotaciones;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 /**
  *
  * @author 2112076
  */
-public @interface webs{
 
-    String media();
+
+ @Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface webs {
+    String value();
+    
 }
+
