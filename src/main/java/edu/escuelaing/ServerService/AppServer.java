@@ -118,7 +118,6 @@ public class AppServer {
                                     out.println("\r\n");
                                     out.println(lista.get(recursoLocacion).inicio(new Object[]{recurso.substring(recurso.indexOf("?") + 1)}));
                                 } else {
-                                    System.out.println("aquiASDA");
                                     enMemoria(recurso, cliente);
                                 }
                             }
@@ -172,7 +171,7 @@ public class AppServer {
         PrintWriter out;
         try {
             out = new PrintWriter(client.getOutputStream(), true);
-            out.println(serverAns);
+            out.print(serverAns);
 
         } catch (IOException ex) {
             Logger.getLogger(AppServer.class.getName()).log(Level.SEVERE, null, ex);
