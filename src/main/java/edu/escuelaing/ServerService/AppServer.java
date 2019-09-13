@@ -34,6 +34,7 @@ import edu.escuelaing.handler.handlers;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.OutputStream;
 import java.util.logging.Handler;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
@@ -95,13 +96,13 @@ public class AppServer {
                 String line;
                 while ((line = in.readLine()) != null) {
                     if (line.toLowerCase().contains("GET".toLowerCase())) {
-                        if(line.toLowerCase().contains("/-".toLowerCase())){
-                            String recurso="/resources/index.html";
+                        if (line.toLowerCase().contains("/-".toLowerCase())) {
+                            String recurso = "/resources/index.html";
                             enMemoria(recurso, cliente);
-                        }
-                        else if (line.toLowerCase().contains("/resources/".toLowerCase())) {
+                        } else if (line.toLowerCase().contains("/resources/".toLowerCase())) {
                             String recurso = line.split(" ")[1];
                             if (!recurso.toLowerCase().contains("?")) {
+
                                 if (lista.containsKey(recurso)) {
                                     out.print("HTTP/1.1 200 OK \r");
                                     out.print("Content-Type: text/html \r\n");
@@ -117,18 +118,36 @@ public class AppServer {
                                         hand hand = new handlers(method);
                                         lista.put("/resources/"+ web.value(), hand);*/
                                     enMemoria(recurso, cliente);
-                            
-                            //}
-                                    
+
+                                    //}
                                 }
                             } else {
                                 String recursoLocacion = recurso.substring(recurso.indexOf("/resources/"), recurso.indexOf("?"));
                                 if (lista.containsKey(recursoLocacion)) {
-                                    out.print("HTTP/1.1 200 OK \r");
-                                    out.print("Content-Type: text/html \r\n");
-                                    out.print("\r\n");
-                                    out.print(lista.get(recursoLocacion).inicio(new Object[]{recurso.substring(recurso.indexOf("?") + 1)}));
-                                    out.flush(); 
+                                    if (line.toLowerCase().contains("?")) {
+                                        
+                                        OutputStream outputSteam = cliente.getOutputStream();
+                                        String[] ina = line.split(" ");
+                                        String[] clas = ina[1].split("value");
+                                        
+                                        String[] prue = ina[1].split("=");
+                                       
+                                        String[] param = new String[1];
+                                        param[0]=prue[1];
+                                        String[] antValue = ina[1].split("value");
+                                        String antParam = antValue[0].substring(0, antValue[0].length() - 1);
+                                        hand h = lista.get(antParam);
+                                        String res = h.inicio(param);
+                                        outputSteam.write(imprima(res).getBytes());
+
+                                    }
+                                    else  {
+                                        out.print("HTTP/1.1 200 OK \r");
+                                        out.print("Content-Type: text/html \r\n");
+                                        out.print("\r\n");
+                                        out.print(lista.get(recursoLocacion).inicio(new Object[]{recurso.substring(recurso.indexOf("?") + 1)}));
+                                        out.flush();
+                                    }
                                 } else {
                                     enMemoria(recurso, cliente);
                                 }
@@ -216,13 +235,40 @@ public class AppServer {
         return 4567; // returns default port if heroku-port isn't set (i.e. on localhost)
     }
 
+    private String imprima(String param) {
+        return "HTTP/1.1 200 OK \r\n"
+                + "Content-Type: text/html; charset=\"utf-8\" \r\n"
+                + "\r\n"
+                + param;
+    }
+
     private void enMemoria(String camino, Socket cliente) throws Exception {
         String path = System.getProperty("user.dir") + camino;
         try {
-            if(path.toLowerCase().contains("?")){
-                
-            }
-            else if (path.toLowerCase().contains(".html".toLowerCase())) {
+            if (path.toLowerCase().contains("?")) {
+                System.out.println("entre prrooooo");
+                OutputStream outputSteam = cliente.getOutputStream();
+                String[] ina = path.split(" ");
+                String[] clas = ina[1].split("/");
+                String[] prue = ina[1].split("=");
+                String[] param = new String[1];
+                Class<?> c = Class.forName("edu.escuelaing.Apps." + clas[2]);
+                for (Method metodo : c.getMethods()) {
+                    if (metodo.isAnnotationPresent(webs.class)) {
+                        if (metodo.getParameterCount() == 1) {
+                            hand metod = new handlers(metodo);
+                            lista.put("/resources/" + c.getSimpleName() + "/" + metodo.getAnnotation(webs.class).value(), metod);
+                        }
+                    }
+                }
+                String[] antValue = ina[1].split("value");
+                String antParam = antValue[0].substring(0, antValue[0].length() - 1);
+                System.out.println(param[0]);
+                hand h = lista.get(antParam);
+                String res = h.inicio(param);
+                outputSteam.write(imprima(res).getBytes());
+
+            } else if (path.toLowerCase().contains(".html".toLowerCase())) {
 
                 getHtml(path, cliente);
             } else if (path.toLowerCase().contains(".png".toLowerCase())) {

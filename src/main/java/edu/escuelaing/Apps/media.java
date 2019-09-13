@@ -20,5 +20,15 @@ public class media {
     {
         return "<!DOCTYPE html> <html> <head> <title> WEB </title>  </head> <body> <h1>Prueba </h1> </body> </html>";
     }
-   
+    @webs(value="prueba1.html")
+    public static String sumar(String n1) {
+        int num = Integer.parseInt(n1);
+        return "<!DOCTYPE html>"
+                +"<html>" + 
+                "<head/>" + 
+                "<body>" + 
+                "<h2> en este momento somos : "
+                + Integer.toString(num)
+                + "</h2>" + "</body>" + "</html>";
+    }
 }
