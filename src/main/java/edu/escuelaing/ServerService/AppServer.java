@@ -109,7 +109,17 @@ public class AppServer {
                                     out.print(lista.get(recurso).iniciar());
                                     out.flush();
                                 } else {
-                                    enMemoria(recurso, cliente);
+                                    String[] ina = line.split(" ");
+                                    String[] clas = ina[1].split("/");
+                                    Class<?> c = Class.forName("edu.escuelaing.arem.Apps." + clas[2]);
+                                    for (Method method : c.getMethods()) {
+                                        webs web = method.getAnnotation(webs.class);
+                                        hand hand = new handlers(method);
+                                        lista.put("/resources/"+ web.value(), hand);
+                                        enMemoria(recurso, cliente);
+                            
+                            }
+                                    
                                 }
                             } else {
                                 String recursoLocacion = recurso.substring(recurso.indexOf("/resources/"), recurso.indexOf("?"));
@@ -209,7 +219,10 @@ public class AppServer {
     private void enMemoria(String camino, Socket cliente) throws Exception {
         String path = System.getProperty("user.dir") + camino;
         try {
-            if (path.toLowerCase().contains(".html".toLowerCase())) {
+            if(path.toLowerCase().contains("?")){
+                
+            }
+            else if (path.toLowerCase().contains(".html".toLowerCase())) {
 
                 getHtml(path, cliente);
             } else if (path.toLowerCase().contains(".png".toLowerCase())) {
