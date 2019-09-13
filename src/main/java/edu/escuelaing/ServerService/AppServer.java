@@ -109,16 +109,16 @@ public class AppServer {
                                     out.print(lista.get(recurso).iniciar());
                                     out.flush();
                                 } else {
-                                    String[] ina = line.split(" ");
+                                    /*String[] ina = line.split(" ");
                                     String[] clas = ina[1].split("/");
                                     Class<?> c = Class.forName("edu.escuelaing.arem.Apps." + clas[2]);
                                     for (Method method : c.getMethods()) {
                                         webs web = method.getAnnotation(webs.class);
                                         hand hand = new handlers(method);
-                                        lista.put("/resources/"+ web.value(), hand);
-                                        enMemoria(recurso, cliente);
+                                        lista.put("/resources/"+ web.value(), hand);*/
+                                    enMemoria(recurso, cliente);
                             
-                            }
+                            //}
                                     
                                 }
                             } else {
